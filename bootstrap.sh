@@ -6,9 +6,9 @@ role=$1
 
 # Assumptions:
 # For now we use IPv4
-# The network range is: 10.244.0.0/16
 # The POD network is Flannel
 # The container runtime is Docker
+# Since it is recommended not to run some parts as root we will create a system user called kubeusr
 
 # Disable swap
 swapoff -a
@@ -63,6 +63,7 @@ systemctl restart docker
 # Great now we have docker installed, let's install kubernetes
 # To do so we need to know if this is a worker or a master node..
 
+install_kubernetes(){
 # Create a user (kubeusr) for use later on
 
 adduser \
@@ -85,6 +86,7 @@ apt clean && apt update
 
 apt install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
+}
 
 kubemaster() {
 # Ask for the network range
@@ -97,6 +99,10 @@ read kubeadmaddr
 # Let's initialise the cluster
 kubeadm init --pod-network-cidr=$kubenetrange --apiserver-advertise-address=$kubeadmaddr
 
+# Wait for 60 seconds so you can save the join token
+echo "I will wait for 60 seconds now so you can write down the join token"
+sleep 60
+
 # Finish this part of the setup
 mkdir -p ~kubeusr/.kube
 cp -i /etc/kubernetes/admin.conf ~kubeusr/.kube/config
@@ -106,10 +112,20 @@ chown -R kubeusr:kubeusr ~kubeusr/.kube/config
 su - kubeusr -c "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml"
 }
 
+kubeworker(){
+echo "What's the join token command you got?"
+read kubejointoken
+$kubejointoken
+}
+
 case $role in
 	master) echo "This is a master"
 		install_docker
+		install_kubernetes
                 kubemaster;;
-	worker) echo "This is a slave":;;
+	worker) echo "This is a worker"
+		install_docker
+		install_kubernetes
+		kubeworker;;
 	*) echo "Please choose between a master and a worker node"
 esac
