@@ -10,9 +10,14 @@ role=$1
 # The container runtime is Docker
 # Since it is recommended not to run some parts as root we will create a system user called kubeusr
 
+disable_swap() {
 # Disable swap
-swapoff -a
-if grep -w "sw" /etc/fstab | grep swap; then sed -i '/swap/d' /etc/fstab; fi
+if grep -q -w "sw" /etc/fstab | grep swap; then sed -i '/swap/d' /etc/fstab && swapoff -a; fi
+}
+
+check_state() {
+if su - kubeusr -c "kubectl get nodes"; then echo "Already active in a cluster, going to exit now" && exit 1; fi
+}
 
 install_docker() {
 # Refresh the apt database
@@ -121,10 +126,14 @@ $kubejointoken
 
 case $role in
 	master) echo "This is a master"
+		check_state
+		disable_swap
 		install_docker
 		install_kubernetes
                 kubemaster;;
 	worker) echo "This is a worker"
+		check_state
+		disable_swap
 		install_docker
 		install_kubernetes
 		kubeworker;;
