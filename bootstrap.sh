@@ -12,6 +12,7 @@ role=$1
 
 # Disable swap
 swapoff -a
+if grep -w "sw" /etc/fstab | grep swap; then sed -i '/swap/d' /etc/fstab; fi
 
 install_docker() {
 # Refresh the apt database
