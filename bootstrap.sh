@@ -12,7 +12,7 @@ role=$1
 
 disable_swap() {
 # Disable swap
-if grep -q -w "sw" /etc/fstab | grep swap; then sed -i '/swap/d' /etc/fstab && swapoff -a; fi
+if grep -w "sw" /etc/fstab | grep swap; then sed -i '/swap/d' /etc/fstab && swapoff -a; fi
 }
 
 check_state() {
