@@ -115,7 +115,7 @@ cp -i /etc/kubernetes/admin.conf ~kubeusr/.kube/config
 chown -R kubeusr:kubeusr ~kubeusr/.kube
 
 # Let's set Flannel as POD network type
-su - kubeusr -c "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml"
+su - kubeusr -c "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
 }
 
 kubeworker(){
