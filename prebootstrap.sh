@@ -4,6 +4,7 @@
 ln -s /usr/share/ca-certificates/mozilla/Starfield_Services_Root_Certificate_Authority_-_G2.crt /usr/local/share/ca-certificates/Starfield_Services_Root_Certificate_Authority_-_G2.crt
 ln -s /usr/share/ca-certificates/mozilla/Amazon_Root_CA_1.crt /usr/local/share/ca-certificates/Amazon_Root_CA_1.crt
 ln -s /usr/share/ca-certificates/mozilla/GlobalSign_Root_CA_-_R2.crt /usr/local/share/ca-certificates/GlobalSign_Root_CA_-_R2.crt
+update-ca-certificates
 
 # Install required packages
 apt install -y curl git
